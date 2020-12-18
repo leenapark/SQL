@@ -34,12 +34,13 @@ from employees;
 부서별로 평균임금, 최고임금, 최저임금을 부서아이디(department_id)와 함께 출력합니다.
 정렬순서는 부서번호(department_id) 내림차순입니다.
 */
-select  avg(salary),
-        max(salary),
-        min(salary),
-        department_id
+select  avg(salary) "평균임금",
+        max(salary) "최고임금",
+        min(salary) "최저임금",
+        department_id "부서 번호"
 from employees
-group by department_id;
+group by department_id
+order by department_id desc;
 
 --평균 소수점을 2자리까지 표기, 부서 번호 내림차순으로 정렬하여 정리
 select  trunc(avg(salary), 2),
@@ -59,7 +60,7 @@ order by department_id desc;
 (정렬순서는 최소임금 2500 구간일때 확인해볼 것)
 */
 select  job_id,
-        round(avg(salary), 2),
+        round(avg(salary), 0),
         max(salary),
         min(salary)
 from employees
