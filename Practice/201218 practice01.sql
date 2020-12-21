@@ -26,7 +26,7 @@ from employees;
 마지막으로 신입사원이 들어온 날은 언제 입니까? 다음 형식으로 출력해주세요.
 예) 2014년 07월 10일
 */
-select  to_char(max(hire_date), 'YYYY"년" MM"월" DD"일"')
+select  to_char(max(hire_date), 'YYYY"년" MM"월" DD"일"') "입사일"
 from employees;
 
 /*
@@ -43,10 +43,10 @@ group by department_id
 order by department_id desc;
 
 --평균 소수점을 2자리까지 표기, 부서 번호 내림차순으로 정렬하여 정리
-select  trunc(avg(salary), 2),
-        max(salary),
-        min(salary),
-        department_id
+select  trunc(avg(salary), 2) "평균임금",
+        max(salary) "최고임금",
+        min(salary) "최저임금",
+        department_id "부서 번호"
 from employees
 group by department_id
 order by department_id desc;
@@ -59,10 +59,10 @@ order by department_id desc;
 정렬순서는 최저임금 내림차순, 평균임금(소수점 반올림), 오름차순 순입니다.
 (정렬순서는 최소임금 2500 구간일때 확인해볼 것)
 */
-select  job_id,
-        round(avg(salary), 0),
-        max(salary),
-        min(salary)
+select  job_id "업무",
+        round(avg(salary), 0) "평균임금",
+        max(salary) "최고임금",
+        min(salary) "최저임금"
 from employees
 group by job_id
 order by min(salary) desc, round(avg(salary), 0) asc;
@@ -82,10 +82,10 @@ from employees;
 평균임금과 최저임금의 차이가 2000 미만인 부서(department_id), 평균임금, 최저임금
 그리고 (평균임금 – 최저임금)를 (평균임금 – 최저임금)의 내림차순으로 정렬해서 출력하세요.
 */
-select  department_id,
-        avg(salary),
-        min(salary),
-        avg(salary)-min(salary)
+select  department_id "부서 번호",
+        avg(salary) "평균임금",
+        min(salary) "최저임금",
+        avg(salary)-min(salary) "임금차"
 from employees
 group by department_id
 order by avg(salary)-min(salary) desc;
@@ -95,11 +95,20 @@ order by avg(salary)-min(salary) desc;
 업무(JOBS)별로 최고임금과 최저임금의 차이를 출력해보세요.
 차이를 확인할 수 있도록 내림차순으로 정렬하세요
 */
-select  job_id,
-        max(salary)-min(salary)
+select  job_id "업무",
+        max(salary)-min(salary) "임금차"
 from employees
 group by job_id
 order by max(salary)-min(salary) desc;
+
+
+--실행 순서 from - where - group by - having - select - order by
+--select 문이 실행되면서 별명이 붙기 때문에 정렬을 별명으로 해줄 수 있음
+select  job_id "업무",
+        max(salary)-min(salary) "임금차"
+from employees
+group by job_id
+order by "임금차" desc;
 
 
 /*
@@ -108,14 +117,28 @@ order by max(salary)-min(salary) desc;
 출력은 관리자별로 평균급여가 5000이상 중에 평균급여 최소급여 최대급여를 출력합니다.
 평균급여의 내림차순으로 정렬하고 평균급여는 소수점 첫째짜리에서 반올림 하여 출력합니다.
 */
-select  manager_id,
-        round(avg(salary), 0),
-        min(salary),
-        max(salary)
+--원래 쓴 코드
+select  manager_id "관리자",
+        round(avg(salary), 0) "평균급여",
+        min(salary) "최소급여",
+        max(salary) "최대급여"
 from employees
 group by hire_date, manager_id
 having hire_date > '2005/12/31'
 and round(avg(salary), 1) >= 5000
+order by avg(salary) desc;
+/*
+SQL 실행 순서 from - where - group by - having - select - order by
+where 절이 먼저 실행됨으로 hire_date 를 그룹 지어주지 않고 먼저 걸러준다
+*/
+select  manager_id "관리자",
+        round(avg(salary), 0) "평균급여",
+        min(salary) "최소급여",
+        max(salary) "최대급여"
+from employees
+where hire_date > '2005/12/31' 
+group by manager_id
+having round(avg(salary), 1) >= 5000
 order by avg(salary) desc;
 
 
