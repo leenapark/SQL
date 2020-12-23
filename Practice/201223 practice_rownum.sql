@@ -113,4 +113,166 @@ order by de.department_name asc;
 문제5.
 2005년 이후 입사한 직원중에 입사일이 11번째에서 20번째의 직원의 
 사번, 이름, 부서명, 급여, 입사일을 입사일 순서로 출력하세요
+(rownum(order by))
 */
+select  ro.rnum,
+        ro.employee_id "사번",
+        ro.first_name "이름",
+        ro.department_name "부서명",
+        ro.salary "급여",
+        ro.hire_date "입사일"
+from (select  rownum rnum,
+        sor.employee_id,
+        sor.first_name,
+        sor.department_name,
+        sor.salary,
+        sor.hire_date
+      from (select  e.employee_id,
+                    e.first_name,
+                    d.department_name,
+                    e.salary,
+                    e.hire_date
+            from employees e, departments d
+            where e.hire_date > '04/12/31'
+            and e.department_id = d.department_id
+            order by e.hire_date
+            ) sor
+      ) ro
+where ro.rnum >= 11
+and ro.rnum <=20;
+
+
+/*
+문제6.
+가장 늦게 입사한 직원의
+이름(first_name last_name)과
+연봉(salary)과
+근무하는 부서 이름(department_name)은?
+*/
+select  em.first_name||' '||em.last_name,
+        em.salary,
+        de.department_name,
+        em.hire_date
+from employees em, departments de
+where em.department_id = de.department_id
+and em.hire_date = (select  max(hire_date)
+                    from employees);
+                    
+
+/*
+문제7.
+평균연봉(salary)이 가장 높은 부서 직원들의
+직원번호(employee_id),
+이름(firt_name),
+성(last_name)과
+업무(job_title),
+연봉(salary)을 조회하시오.
+*/
+--가장 높은 평균 연봉
+select  max(avg(salary)) sal
+from employees
+group by department_id
+order by sal desc;
+
+--평균 연봉 & 부서
+select  department_id,
+        avg(salary)
+from employees
+group by department_id;
+
+select  e.employee_id "직원번호",
+        e.first_name "이름",
+        e.last_name "성",
+        j.job_title "업무",
+        e.salary "급여",
+        se.msal "평균급여"
+from employees e, jobs j, (select  department_id de,
+                                   avg(salary) sal
+                           from employees
+                           group by employee_id, department_id
+                           order by sal desc) s,  (select  max(avg(salary)) msal
+                                                   from employees
+                                                   group by department_id
+                                                   order by msal desc) se
+where e.job_id = j.job_id
+and s.sal > se.msal
+and e.department_id = s.de;
+
+
+/*
+문제8.
+평균 급여(salary)가 가장 높은 부서는? 
+*/
+--부서별 평균 급여
+select  avg(salary)
+from employees
+group by department_id;
+
+--가장 높은 평균 급여
+select  max(avg(salary))
+from employees
+group by department_id;
+
+select  d.department_name
+from employees e, departments d,(select  max(avg(salary)) sal
+                                 from employees
+                                 group by department_id) s
+where e.department_id = d.department_id
+and e.salary > s.sal;
+ 
+
+/*
+문제9.
+평균 급여(salary)가 가장 높은 지역은? 
+*/
+select  r.region_name,
+        avg(e.salary) sal
+from employees e, departments d, locations l, countries c, regions r
+where e.department_id = d.department_id
+and d.location_id = l.location_id
+and l.country_id = c.country_id
+and c.region_id = r.region_id
+group by r.region_name
+order by sal desc;
+
+select  ro.region_name
+from   (select  rownum rnum,
+                o.region_name
+        from   (select  r.region_name,
+                        avg(e.salary) sal
+                from employees e, departments d, locations l, countries c, regions r
+                where e.department_id = d.department_id
+                and d.location_id = l.location_id
+                and l.country_id = c.country_id
+                and c.region_id = r.region_id
+                group by r.region_name
+                order by sal desc
+                ) o
+        ) ro
+where ro.rnum = 1;
+
+
+/*
+문제10.
+평균 급여(salary)가 가장 높은 업무는? 
+*/
+select  j.job_title,
+        avg(salary) sal
+from employees e, jobs j
+where e.job_id = j.job_id
+group by j.job_title
+order by sal desc;
+
+
+select  ro.job_title
+from (select  rownum rnum,
+              job_title
+      from (select  j.job_title,
+                    avg(salary) sal
+            from employees e, jobs j
+            where e.job_id = j.job_id
+            group by j.job_title
+            order by sal desc
+            ) o
+      ) ro
+where ro.rnum = 1;      
