@@ -48,7 +48,7 @@ values (seq_author_id.nextval, '김영하', '알쓸신잡');
 
 
 --book 데이터 생성
-insert into book
+insert into book (book_id, title, pubs, pub_date, author_id)
 values (seq_book_id.nextval, '우리들의 일그러진 영웅', '다림', '1998/02/22', 1);
 
 insert into book
@@ -106,9 +106,10 @@ from book;
 
 
 --수정 & 삭제용
-delete from book
-where book_id = 1;
+delete from author;
+delete from book;
 
-drop table book;
+drop table author;
 
+drop sequence seq_author_id;
 drop sequence seq_book_id;
