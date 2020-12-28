@@ -90,6 +90,10 @@ delete from author
 where author_id = 4;
 
 
+--commit
+commit;
+
+
 --test 조회
 select *
 from author;
